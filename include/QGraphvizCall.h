@@ -43,7 +43,7 @@ inline QGraphicsScene* getGraphvizScene(const QString& source){
     return scene;
 }
 
-inline void show(const QString& source){
+inline QGraphicsView* show(const QString& source){
     if(QGraphicsScene* scene = getGraphvizScene(source)){
         QGraphicsView* view = new QGraphicsView(scene);
         view->scale(2,2);
@@ -53,7 +53,11 @@ inline void show(const QString& source){
         view->setScene(scene);
         view->setWindowTitle("Graphviz Output");
         view->show();
+		
+		return view;
     }
+	
+	return nullptr;
 }
 
 }
