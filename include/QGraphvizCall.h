@@ -4,14 +4,14 @@
 #include <QDebug>
 #include <QGraphicsView>
 #include <QProcess>
-#include <QTemporaryFile>
+#include <QFile>
 #include <QtSvg/QGraphicsSvgItem>
 
 namespace QGraphvizCall{
 
 static bool createSvg(const QString& source){
-    QTemporaryFile dot_file("temp.dot");
-    if(!dot_file.open()){
+    QFile dot_file("temp.dot");
+    if(!dot_file.open(QFile::WriteOnly)){
         qDebug() << "Failed to open \"temp.dot\" in showDot()";
         return false;
     }
@@ -21,6 +21,7 @@ static bool createSvg(const QString& source){
     QProcess process;
     process.start("dot -Tsvg temp.dot -o temp.svg");
     process.waitForFinished();
+    QFile::remove("temp.dot");
     if(!QFile::exists("temp.svg")){
         qDebug() << "QGraphvizCaller: Bad DOT code:" << process.readAllStandardError();
         return false;
