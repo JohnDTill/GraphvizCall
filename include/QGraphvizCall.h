@@ -2,9 +2,10 @@
 #define QGRAPHVIZCALL_H
 
 #include <QDebug>
+#include <QFile>
 #include <QGraphicsView>
 #include <QProcess>
-#include <QFile>
+#include <QWheelEvent>
 #include <QtSvg/QGraphicsSvgItem>
 
 namespace QGraphvizCall{
@@ -53,9 +54,23 @@ inline QGraphicsScene* getGraphvizScene(const QString& source){
     return scene;
 }
 
+class ZoomableView : public QGraphicsView{
+public:
+    inline ZoomableView(QGraphicsScene* scene) : QGraphicsView(scene){}
+    inline virtual void wheelEvent(QWheelEvent* event) override{
+        if( event->modifiers() == Qt::ControlModifier ){
+            constexpr qreal scale_factor = 0.85;
+            if(event->delta() > 0) scale(1/scale_factor, 1/scale_factor);
+            else scale(scale_factor, scale_factor);
+        }else{
+            QGraphicsView::wheelEvent(event);
+        }
+    }
+};
+
 inline QGraphicsView* show(const QString& source){
     if(QGraphicsScene* scene = getGraphvizScene(source)){
-        QGraphicsView* view = new QGraphicsView(scene);
+        QGraphicsView* view = new ZoomableView(scene);
         view->scale(2,2);
         view->setMinimumSize(QSize(300,200));
         view->setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
