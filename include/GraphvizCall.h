@@ -10,7 +10,7 @@ enum Result{
     SUCCESS,
     WRITE_ERROR,
     DOT_CODE_ERROR,
-	DOT_NOT_ON_PATH
+    DOT_NOT_ON_PATH
 };
 
 #ifndef GRAPHVIZ_CALL_EXTENSION_TYPE
@@ -26,10 +26,10 @@ inline Result show(const char* source){
 
     fprintf(out, "%s", source);
     fclose(out);
-	
-	#ifndef NDEBUG
-	if(system("dot -V")) return DOT_NOT_ON_PATH;
-	#endif
+
+    #ifndef NDEBUG
+    if(system("dot -V")) return DOT_NOT_ON_PATH;
+    #endif
 
     system("dot -T" GRAPHVIZ_CALL_STRING(GRAPHVIZ_CALL_EXTENSION_TYPE)
            " temp.dot -o temp." GRAPHVIZ_CALL_STRING(GRAPHVIZ_CALL_EXTENSION_TYPE));

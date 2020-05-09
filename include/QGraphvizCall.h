@@ -20,16 +20,16 @@ static bool createSvg(const QString& source){
     dot_file.close();
 
     QProcess process;
-	#ifndef NDEBUG
-	process.start("dot -V");
-	process.waitForFinished();
-	if(process.error() == QProcess::FailedToStart){
-		qDebug() << "\"dot\" command not found."
-					"Graphviz is not installed or is not on the PATH.";
-		return false;
-	}
-	#endif
-	
+    #ifndef NDEBUG
+    process.start("dot -V");
+    process.waitForFinished();
+    if(process.error() == QProcess::FailedToStart){
+        qDebug() << "\"dot\" command not found."
+                    "Graphviz is not installed or is not on the PATH.";
+        return false;
+    }
+    #endif
+
     process.start("dot -Tsvg temp.dot -o temp.svg");
     process.waitForFinished();
     QFile::remove("temp.dot");
@@ -78,11 +78,11 @@ inline QGraphicsView* show(const QString& source){
         view->setScene(scene);
         view->setWindowTitle("Graphviz Output");
         view->show();
-		
-		return view;
+
+        return view;
     }
-	
-	return nullptr;
+
+    return nullptr;
 }
 
 }
