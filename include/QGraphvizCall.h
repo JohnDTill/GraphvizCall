@@ -19,6 +19,16 @@ static bool createSvg(const QString& source){
     dot_file.close();
 
     QProcess process;
+	#ifndef NDEBUG
+	process.start("dot -V");
+	process.waitForFinished();
+	if(process.error() == QProcess::FailedToStart){
+		qDebug() << "\"dot\" command not found."
+					"Graphviz is not installed or is not on the PATH.";
+		return false;
+	}
+	#endif
+	
     process.start("dot -Tsvg temp.dot -o temp.svg");
     process.waitForFinished();
     QFile::remove("temp.dot");

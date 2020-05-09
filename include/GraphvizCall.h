@@ -7,9 +7,10 @@
 namespace GraphvizCall {
 
 enum Result{
-    GOOD,
+    SUCCESS,
     WRITE_ERROR,
-    DOT_ERROR
+    DOT_CODE_ERROR,
+	DOT_NOT_ON_PATH
 };
 
 #ifndef GRAPHVIZ_CALL_EXTENSION_TYPE
@@ -25,13 +26,17 @@ inline Result show(const char* source){
 
     fprintf(out, "%s", source);
     fclose(out);
+	
+	#ifndef NDEBUG
+	if(system("dot -V")) return DOT_NOT_ON_PATH;
+	#endif
 
     system("dot -T" GRAPHVIZ_CALL_STRING(GRAPHVIZ_CALL_EXTENSION_TYPE)
            " temp.dot -o temp." GRAPHVIZ_CALL_STRING(GRAPHVIZ_CALL_EXTENSION_TYPE));
     remove("temp.dot");
 
     FILE* file = fopen("temp." GRAPHVIZ_CALL_STRING(GRAPHVIZ_CALL_EXTENSION_TYPE), "r");
-    if(!file) return DOT_ERROR;
+    if(!file) return DOT_CODE_ERROR;
     fclose(file);
 
     #ifdef __unix__
@@ -48,7 +53,7 @@ inline Result show(const char* source){
            " \"");
     #endif
 
-    return GOOD;
+    return SUCCESS;
 }
 
 #undef GRAPHVIZ_CALL_STRING_INNER
