@@ -54,13 +54,38 @@ inline QGraphicsScene* getGraphvizScene(const QString& source){
     return scene;
 }
 
-class ZoomableView : public QGraphicsView{
+class GraphVizView : public QGraphicsView{
 public:
-    inline ZoomableView(QGraphicsScene* scene) : QGraphicsView(scene){}
+    inline GraphVizView(QWidget* parent = nullptr) : QGraphicsView(parent){
+        scale(2,2);
+        setMinimumSize(QSize(300,200));
+        setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
+        setScene(new QGraphicsScene(this));
+    }
+
+    inline GraphVizView(QGraphicsScene* scene) : QGraphicsView(scene){
+        scale(2,2);
+        setMinimumSize(QSize(300,200));
+        setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
+    }
+	
+    inline void update(const QString& source){
+        scene()->clear();
+
+        if(!createSvg(source)) return;
+
+        QGraphicsSvgItem* item = new QGraphicsSvgItem("temp.svg");
+        QFile::remove("temp.svg");
+
+        scene()->addItem(item);
+        scene()->setSceneRect(item->boundingRect());
+    }
+	
+private:
     inline virtual void wheelEvent(QWheelEvent* event) override{
         if( event->modifiers() == Qt::ControlModifier ){
             constexpr qreal scale_factor = 0.85;
-            if(event->delta() > 0) scale(1/scale_factor, 1/scale_factor);
+            if(event->angleDelta().y() > 0) scale(1/scale_factor, 1/scale_factor);
             else scale(scale_factor, scale_factor);
         }else{
             QGraphicsView::wheelEvent(event);
@@ -68,12 +93,9 @@ public:
     }
 };
 
-inline QGraphicsView* show(const QString& source){
+inline GraphVizView* show(const QString& source){
     if(QGraphicsScene* scene = getGraphvizScene(source)){
-        QGraphicsView* view = new ZoomableView(scene);
-        view->scale(2,2);
-        view->setMinimumSize(QSize(300,200));
-        view->setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
+        GraphVizView* view = new GraphVizView(scene);
 
         view->setScene(scene);
         view->setWindowTitle("Graphviz Output");
